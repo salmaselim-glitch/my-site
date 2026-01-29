@@ -3,49 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NANO AI ✨</title>
+    <title>NANO AI PRO ✨</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: radial-gradient(circle, #1a1a1a, #000); font-family: sans-serif; }
+    </style>
 </head>
-<body class="bg-[#0b0f1a] text-white min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-md bg-[#161b2c] p-6 rounded-3xl shadow-2xl border border-gray-800 text-center">
-        <h1 class="text-2xl font-bold text-cyan-400 mb-6">المساعد الذكي 🚀</h1>
-        <textarea id="txt" class="w-full h-32 bg-[#0b0f1a] border border-gray-700 rounded-2xl p-4 mb-4 outline-none focus:border-cyan-500 text-white text-right" placeholder="اسألي أي حاجة..."></textarea>
-        <button onclick="ask()" id="btn" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-4 rounded-2xl transition-all">إرسال السؤال</button>
-        <div id="res" class="mt-6 p-4 bg-[#0b0f1a] rounded-xl border border-gray-800 hidden text-sm leading-relaxed text-right"></div>
+<body class="text-white min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-[#111] border-2 border-yellow-500/50 rounded-[2.5rem] p-8 shadow-2xl">
+        <h1 class="text-3xl font-black text-center text-yellow-500 mb-8 tracking-tighter">NANO INTELLIGENCE</h1>
+        
+        <textarea id="q" class="w-full bg-black/50 border border-gray-800 rounded-2xl p-5 mb-6 text-xl outline-none focus:border-yellow-500 h-44 resize-none transition-all" placeholder="اسألي أي حاجة يا سلمى..."></textarea>
+        
+        <button onclick="ask()" id="b" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-black py-5 rounded-2xl text-2xl transition-all shadow-lg active:scale-95">إرسال ⚡</button>
+        
+        <div id="res" class="mt-8 p-6 bg-white/5 rounded-2xl hidden border-r-4 border-yellow-500 leading-relaxed text-right text-lg"></div>
     </div>
 
     <script>
         async function ask() {
-            const btn = document.getElementById('btn');
-            const res = document.getElementById('res');
-            const txt = document.getElementById('txt').value;
+            const b = document.getElementById('b'), r = document.getElementById('res'), q = document.getElementById('q').value;
+            // المفتاح بتاعك اللي بعتيه ركبته هنا خلاص
             const k = "AIzaSyDzoShzLc-jVLcLd2X8t-k4D8hJE-dV85A";
 
-            if(!txt) return;
-            btn.innerText = "جاري التفكير...";
-            res.classList.remove('hidden');
-            res.innerText = "بيفكر...";
+            if(!q) return;
+            b.innerText = "بيفكر...";
+            r.classList.remove('hidden');
+            r.innerText = "جاري الاتصال بالعقل الإلكتروني...";
 
             try {
-                // غيرنا الموديل هنا لـ gemini-pro عشان يشتغل على v1 و v1beta بدون مشاكل
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${k}`, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${k}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({contents: [{parts: [{text: txt}]}]})
+                    body: JSON.stringify({contents: [{parts: [{text: q}]}]})
                 });
                 const data = await response.json();
                 
-                if(data.error) {
-                    res.innerHTML = "❌ خطأ: " + data.error.message;
-                } else if (data.candidates && data.candidates[0].content) {
-                    res.innerText = data.candidates[0].content.parts[0].text;
+                if (data.error) {
+                    r.innerText = "جوجل بتقول: " + data.error.message;
                 } else {
-                    res.innerText = "جوجل ماردتش، جربي تغيري السؤال.";
+                    const reply = data.candidates[0].content.parts[0].text;
+                    r.innerText = reply;
+                    // ميزة النطق الصوتي
+                    const s = new SpeechSynthesisUtterance(reply);
+                    s.lang = 'ar-SA';
+                    window.speechSynthesis.speak(s);
                 }
             } catch (e) {
-                res.innerText = "مشكلة في الاتصال.. حاولي تاني.";
+                r.innerText = "مشكلة في الشبكة، حاولي تاني.";
             } finally {
-                btn.innerText = "إرسال السؤال";
+                b.innerText = "إرسال ⚡";
             }
         }
     </script>
