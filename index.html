@@ -2,14 +2,26 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>NANO BANANA</title>
+    <title>منصة نانو الشاملة 🚀</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>body { font-family: sans-serif; }</style>
 </head>
-<body class="bg-blue-50 flex flex-col items-center justify-center min-h-screen">
-    <div class="bg-white p-10 rounded-3xl shadow-xl text-center border-4 border-blue-600">
-        <h1 class="text-4xl font-black text-blue-600 mb-4">NANO BANANA 🍌</h1>
-        <p class="text-xl text-gray-700">مبروك يا سلمى! الموقع شغال رسمياً.</p>
-        <div class="mt-6 p-4 bg-green-100 text-green-700 rounded-xl font-bold">جاهزة للمرحلة الجاية</div>
+<body class="bg-slate-900 text-white p-5">
+    <div class="max-w-4xl mx-auto text-center">
+        <h1 class="text-4xl font-bold text-yellow-400 mb-10">NANO MULTI-AI 🍌</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-right">
+            <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700">
+                <h3 class="mb-3">🎥 تحليل فيديوهات</h3>
+                <input id="vUrl" type="text" placeholder="رابط الفيديو..." class="w-full p-2 bg-slate-900 rounded mb-2">
+                <button onclick="alert('جاري ربط محرك الفيديو...')" class="w-full bg-yellow-500 text-black py-2 rounded font-bold">تحليل</button>
+            </div>
+            <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700">
+                <h3 class="mb-3">🎙️ توليد صوت AI</h3>
+                <textarea id="vText" placeholder="اكتب النص..." class="w-full p-2 bg-slate-900 rounded mb-2 h-20"></textarea>
+                <button onclick="alert('جاري ربط محرك الصوت...')" class="w-full bg-blue-500 py-2 rounded font-bold">توليد الصوت</button>
+            </div>
+        </div>
+        <div id="status" class="mt-10 text-slate-400 font-italic italic">المنصة جاهزة يا سلمى، بانتظار تفعيل المحركات...</div>
     </div>
 </body>
 </html>
