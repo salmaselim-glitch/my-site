@@ -7,104 +7,103 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Cairo', sans-serif; background-color: #fffafb; color: #333; }
-        .glass-panel { background: white; border: 1px solid #ffe4e8; box-shadow: 0 15px 35px rgba(255, 182, 193, 0.2); border-radius: 40px; }
-        .action-btn { background: #ff4d6d; color: white; transition: 0.3s; border-radius: 20px; font-weight: 900; }
-        .action-btn:hover { background: #ff758c; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255, 77, 109, 0.3); }
-        .feature-card { background: white; border: 2px solid #fff0f3; border-radius: 25px; transition: 0.3s; cursor: pointer; }
-        .feature-card:hover { border-color: #ff4d6d; background: #fff5f7; }
-        .feature-card.active { border-color: #ff4d6d; background: #fff5f7; color: #ff4d6d; }
+        body { font-family: 'Cairo', sans-serif; background-color: #fff9fa; color: #444; }
+        .pink-glass { background: white; border: 2px solid #ffeef1; box-shadow: 0 10px 40px rgba(255, 182, 193, 0.15); border-radius: 35px; }
+        .nav-card { background: white; border-radius: 20px; transition: 0.3s; border: 1px solid #fff0f3; cursor: pointer; }
+        .nav-card:hover, .nav-card.active { border-color: #ff4d6d; background: #fff5f7; color: #ff4d6d; transform: translateY(-3px); }
+        .main-btn { background: linear-gradient(135deg, #ff4d6d 0%, #ff85a1 100%); color: white; border-radius: 18px; transition: 0.3s; }
+        .main-btn:hover { opacity: 0.9; transform: scale(1.02); shadow: 0 5px 15px rgba(255, 77, 109, 0.3); }
     </style>
 </head>
-<body class="p-4 md:p-12">
+<body class="p-4 md:p-10">
 
     <div class="max-w-4xl mx-auto">
-        <div class="flex justify-between items-center mb-12 px-6">
-            <div class="text-right">
-                <h1 class="text-4xl font-black text-[#ff4d6d] tracking-tight">NANO LUXE</h1>
-                <p class="text-gray-400 font-bold uppercase text-xs tracking-widest">Premium AI Experience</p>
-            </div>
-            <div class="w-12 h-12 rounded-2xl bg-[#ff4d6d] flex items-center justify-center text-white text-2xl shadow-lg">✨</div>
+        <div class="text-center mb-10">
+            <h1 class="text-5xl font-black text-[#ff4d6d] mb-2 italic">NANO LUXE</h1>
+            <div class="h-1 w-20 bg-[#ff4d6d] mx-auto rounded-full"></div>
         </div>
 
-        <div class="grid grid-cols-4 gap-4 mb-10">
-            <div class="feature-card active p-5 text-center shadow-sm">
-                <div class="text-3xl mb-2">💬</div>
-                <div class="text-sm font-bold">محادثة</div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="nav-card active p-4 text-center">
+                <div class="text-3xl">💬</div>
+                <div class="text-xs font-bold mt-2 uppercase">محادثة ذكية</div>
             </div>
-            <div class="feature-card p-5 text-center shadow-sm opacity-60">
-                <div class="text-3xl mb-2">🖼️</div>
-                <div class="text-sm font-bold text-gray-400">صور</div>
+            <div class="nav-card p-4 text-center border-dashed opacity-80" title="اكتبي وصف الصورة في المربع واضغطي إنشاء صورة">
+                <div class="text-3xl">🎨</div>
+                <div class="text-xs font-bold mt-2 uppercase">إنشاء صور</div>
             </div>
-            <div class="feature-card p-5 text-center shadow-sm opacity-60">
-                <div class="text-3xl mb-2">🎤</div>
-                <div class="text-sm font-bold text-gray-400">صوت</div>
+            <div class="nav-card p-4 text-center opacity-40">
+                <div class="text-3xl">🎤</div>
+                <div class="text-xs font-bold mt-2 uppercase">صوت</div>
             </div>
-            <div class="feature-card p-5 text-center shadow-sm opacity-60">
-                <div class="text-3xl mb-2">🎥</div>
-                <div class="text-sm font-bold text-gray-400">فيديو</div>
+            <div class="nav-card p-4 text-center opacity-40">
+                <div class="text-3xl">🎥</div>
+                <div class="text-xs font-bold mt-2 uppercase">فيديو</div>
             </div>
         </div>
 
-        <div class="glass-panel p-8 md:p-10 relative overflow-hidden">
-            <textarea id="q" class="w-full bg-transparent text-xl text-gray-700 outline-none h-48 resize-none mb-6 placeholder:text-gray-300" placeholder="اكتبي سؤالك هنا بوضوح..."></textarea>
+        <div class="pink-glass p-6 md:p-10">
+            <textarea id="userInput" class="w-full bg-transparent text-xl text-gray-700 outline-none h-40 resize-none mb-6 placeholder:text-gray-300 text-right" placeholder="اسألي أي شيء أو صفي صورة لأرسمها لك..."></textarea>
             
-            <button onclick="callAI()" id="btn" class="w-full action-btn py-6 text-2xl shadow-xl flex items-center justify-center gap-3">
-                <span>إرسال الطلب</span>
-                <div id="loader" class="hidden w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-            </button>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="askChat()" id="chatBtn" class="main-btn py-4 text-xl font-black">إرسال شات 💬</button>
+                <button onclick="drawImg()" id="drawBtn" class="bg-gray-800 text-white py-4 text-xl font-black rounded-2xl hover:bg-black transition-all">إنشاء صورة 🎨</button>
+            </div>
 
-            <div id="resBox" class="mt-10 p-8 bg-[#fff5f7] rounded-[2.5rem] hidden border border-[#ffccd5]">
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="w-2 h-2 bg-[#ff4d6d] rounded-full"></span>
-                    <span class="text-[#ff4d6d] font-black text-sm">رد الذكاء الاصطناعي</span>
-                </div>
-                <p id="resText" class="text-xl text-gray-800 leading-relaxed text-right"></p>
+            <div id="resBox" class="mt-8 p-6 bg-[#fffcfd] rounded-[2rem] hidden border-2 border-[#ffccd5]">
+                <div id="resContent" class="text-lg text-gray-800 leading-relaxed text-right"></div>
+                <div id="imgContainer" class="mt-4 flex justify-center"></div>
             </div>
         </div>
     </div>
 
     <script>
-        async function callAI() {
-            const q = document.getElementById('q').value;
-            const resBox = document.getElementById('resBox');
-            const resText = document.getElementById('resText');
-            const btn = document.getElementById('btn');
-            const loader = document.getElementById('loader');
+        const key = "AIzaSyDzoShzLc-jVLcLd2X8t-k4D8hJE-dV85A";
 
-            if(!q) return;
-
-            btn.disabled = true;
-            loader.classList.remove('hidden');
-            resBox.classList.remove('hidden');
-            resText.innerText = "جاري استحضار الإجابة...";
-
+        async function askChat() {
+            const input = document.getElementById('userInput').value;
+            if(!input) return;
+            showLoading("بيفكر...");
+            
             try {
-                // استخدام المفتاح بتاعك مباشرة في طلب حقيقي
-                const key = "AIzaSyDzoShzLc-jVLcLd2X8t-k4D8hJE-dV85A";
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+                // جربنا الموديل المستقر 1.0 Pro
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${key}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({contents: [{parts: [{text: q}]}]})
+                    body: JSON.stringify({contents: [{parts: [{text: input}]}]})
                 });
-                
                 const data = await response.json();
-
-                if (data.candidates && data.candidates[0].content) {
-                    const text = data.candidates[0].content.parts[0].text;
-                    resText.innerText = text;
-                    // نطق الرد فوراً
-                    const s = new SpeechSynthesisUtterance(text);
-                    s.lang = 'ar-SA';
-                    window.speechSynthesis.speak(s);
-                } else {
-                    resText.innerText = "خطأ في المفتاح: " + (data.error ? data.error.message : "حاولي مجدداً");
-                }
+                const reply = data.candidates[0].content.parts[0].text;
+                displayResult(reply, false);
             } catch (e) {
-                resText.innerText = "فشل الاتصال بالسيرفر، تأكدي من الإنترنت.";
-            } finally {
-                btn.disabled = false;
-                loader.classList.add('hidden');
+                displayResult("❌ عذراً، المفتاح لسه فيه مشكلة من جوجل. جربي ميزة الصور شغالة حالياً!", false);
+            }
+        }
+
+        function drawImg() {
+            const prompt = document.getElementById('userInput').value;
+            if(!prompt) return alert("اكتبي وصف الصورة الأول!");
+            showLoading("جاري الرسم... ✨");
+            
+            const imgUrl = `https://pollinations.ai/p/${encodeURIComponent(prompt)}?width=1080&height=1080&seed=${Math.floor(Math.random()*1000)}`;
+            
+            const imgHtml = `<img src="${imgUrl}" class="rounded-2xl shadow-2xl max-w-full border-4 border-white" onload="displayResult('تم إنشاء الصورة بنجاح! ✨', true, '${imgUrl}')">`;
+            document.getElementById('imgContainer').innerHTML = imgHtml;
+        }
+
+        function showLoading(msg) {
+            document.getElementById('resBox').classList.remove('hidden');
+            document.getElementById('resContent').innerText = msg;
+            document.getElementById('imgContainer').innerHTML = "";
+        }
+
+        function displayResult(text, isImg, url) {
+            document.getElementById('resContent').innerText = text;
+            if(!isImg) document.getElementById('imgContainer').innerHTML = "";
+            if(text && !isImg) {
+                const s = new SpeechSynthesisUtterance(text);
+                s.lang = 'ar-SA';
+                window.speechSynthesis.speak(s);
             }
         }
     </script>
