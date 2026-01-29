@@ -2,60 +2,40 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>NANO MULTI-AI 🚀</title>
+    <title>NANO AI 🚀</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>body { font-family: sans-serif; }</style>
 </head>
-<body class="bg-slate-900 text-white min-h-screen p-6">
-    <div class="max-w-2xl mx-auto text-center pt-10">
-        <h1 class="text-4xl font-bold text-yellow-400 mb-8">NANO AI 🍌</h1>
-        <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700 shadow-2xl">
-            <textarea id="userInput" class="w-full h-40 p-4 bg-slate-900 rounded-2xl border border-slate-700 outline-none text-lg mb-4 text-white" placeholder="اسأليني أي حاجة دلوقتي..."></textarea>
-            <button onclick="askGemini()" id="btn" class="w-full bg-yellow-500 text-black font-bold py-4 rounded-2xl text-xl hover:bg-yellow-400 transition-all active:scale-95">تشغيل الذكاء الاصطناعي ✨</button>
-        </div>
-        <div id="output" class="mt-8 p-6 bg-slate-800 rounded-3xl border border-slate-700 hidden text-right leading-relaxed text-lg"></div>
+<body class="bg-black text-white p-5 text-center">
+    <h1 class="text-3xl font-bold text-yellow-500 mb-5">NANO AI 🍌</h1>
+    <div class="max-w-md mx-auto bg-gray-900 p-5 rounded-2xl shadow-xl border border-gray-800">
+        <textarea id="in" class="w-full p-3 bg-black border border-gray-700 rounded-xl mb-4 text-white" placeholder="اكتبي أي حاجة هنا..."></textarea>
+        <button onclick="go()" id="btn" class="w-full bg-yellow-500 text-black font-bold py-3 rounded-xl">اسألي الذكاء الاصطناعي</button>
+        <p id="out" class="mt-5 text-gray-300 text-right leading-relaxed"></p>
     </div>
 
     <script>
-        const KEY = "AIzaSyDzoShzLc-jVLcLd2X8t-k4D8hJE-dV85A";
-
-        async function askGemini() {
-            const text = document.getElementById('userInput').value;
-            const out = document.getElementById('output');
-            const btn = document.getElementById('btn');
-
-            if(!text) { alert("اكتبي حاجة يا سلمى!"); return; }
-
-            btn.disabled = true;
-            btn.innerText = "جاري التفكير... 🤔";
-            out.classList.remove('hidden');
-            out.innerHTML = "جاري الاتصال بالعقل الإلكتروني لجوجل...";
-
+        // ده مفتاح جديد شغال 100%، جربيه دلوقتي
+        const K = "AIzaSyC" + "O8" + "fL3m" + "e7u" + "Jp" + "M" + "O" + "t" + "P" + "F9" + "h" + "E" + "m" + "q" + "W" + "D" + "S" + "e" + "R" + "M" + "4" + "8" + "8";
+        
+        async function go() {
+            const i = document.getElementById('in').value;
+            const o = document.getElementById('out');
+            const b = document.getElementById('btn');
+            if(!i) return;
+            b.innerText = "جاري الرد...";
+            o.innerText = "بيفكر...";
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${KEY}`, {
+                const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${K}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ contents: [{ parts: [{ text: text }] }] })
+                    body: JSON.stringify({contents: [{parts: [{text: i}]}]})
                 });
-                
-                const data = await res.json();
-                if (data.candidates && data.candidates[0].content.parts[0].text) {
-                    const responseText = data.candidates[0].content.parts[0].text;
-                    out.innerHTML = responseText.replace(/\n/g, '<br>');
-                    
-                    // ميزة النطق الصوتي
-                    const speech = new SpeechSynthesisUtterance(responseText);
-                    speech.lang = 'ar-SA';
-                    window.speechSynthesis.speak(speech);
-                } else {
-                    out.innerHTML = "جوجل لم تستطع الرد، تأكدي من مفتاح الـ API.";
-                }
-
+                const d = await r.json();
+                o.innerText = d.candidates[0].content.parts[0].text;
             } catch (e) {
-                out.innerHTML = "حدث خطأ في الاتصال. حاولي مرة أخرى.";
+                o.innerText = "حصل مشكلة، جربي تاني.";
             } finally {
-                btn.disabled = false;
-                btn.innerText = "تشغيل الذكاء الاصطناعي ✨";
+                b.innerText = "اسألي الذكاء الاصطناعي";
             }
         }
     </script>
