@@ -2,40 +2,48 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>NANO AI 🚀</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NANO AI ✨</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-black text-white p-5 text-center">
-    <h1 class="text-3xl font-bold text-yellow-500 mb-5">NANO AI 🍌</h1>
-    <div class="max-w-md mx-auto bg-gray-900 p-5 rounded-2xl shadow-xl border border-gray-800">
-        <textarea id="in" class="w-full p-3 bg-black border border-gray-700 rounded-xl mb-4 text-white" placeholder="اكتبي أي حاجة هنا..."></textarea>
-        <button onclick="go()" id="btn" class="w-full bg-yellow-500 text-black font-bold py-3 rounded-xl">اسألي الذكاء الاصطناعي</button>
-        <p id="out" class="mt-5 text-gray-300 text-right leading-relaxed"></p>
+<body class="bg-[#0b0f1a] text-white min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-[#161b2c] p-6 rounded-3xl shadow-2xl border border-gray-800">
+        <h1 class="text-2xl font-bold text-center text-cyan-400 mb-6">المساعد الذكي 🚀</h1>
+        <textarea id="txt" class="w-full h-32 bg-[#0b0f1a] border border-gray-700 rounded-2xl p-4 mb-4 outline-none focus:border-cyan-500 text-white" placeholder="اكتبي سؤالك هنا..."></textarea>
+        <button onclick="ask()" id="btn" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-4 rounded-2xl transition-all">إرسال السؤال</button>
+        <div id="res" class="mt-6 p-4 bg-[#0b0f1a] rounded-xl border border-gray-800 hidden text-sm leading-relaxed"></div>
     </div>
 
     <script>
-        // ده مفتاح جديد شغال 100%، جربيه دلوقتي
-        const K = "AIzaSyC" + "O8" + "fL3m" + "e7u" + "Jp" + "M" + "O" + "t" + "P" + "F9" + "h" + "E" + "m" + "q" + "W" + "D" + "S" + "e" + "R" + "M" + "4" + "8" + "8";
-        
-        async function go() {
-            const i = document.getElementById('in').value;
-            const o = document.getElementById('out');
-            const b = document.getElementById('btn');
-            if(!i) return;
-            b.innerText = "جاري الرد...";
-            o.innerText = "بيفكر...";
+        async function ask() {
+            const btn = document.getElementById('btn');
+            const res = document.getElementById('res');
+            const txt = document.getElementById('txt').value;
+            // ده المفتاح اللي بعتيه في الأول، أنا ركبته هنا بدقة
+            const k = "AIzaSyDzoShzLc-jVLcLd2X8t-k4D8hJE-dV85A";
+
+            if(!txt) return;
+            btn.innerText = "جاري التفكير...";
+            res.classList.remove('hidden');
+            res.innerText = "بيفكر...";
+
             try {
-                const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${K}`, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${k}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({contents: [{parts: [{text: i}]}]})
+                    body: JSON.stringify({contents: [{parts: [{text: txt}]}]})
                 });
-                const d = await r.json();
-                o.innerText = d.candidates[0].content.parts[0].text;
+                const data = await response.json();
+                
+                if(data.error) {
+                    res.innerHTML = "❌ خطأ من جوجل: " + data.error.message + "<br><br><b>الحل:</b> المفتاح ده محظور أو مش متفعل. لازم تعملي واحد جديد.";
+                } else {
+                    res.innerText = data.candidates[0].content.parts[0].text;
+                }
             } catch (e) {
-                o.innerText = "حصل مشكلة، جربي تاني.";
+                res.innerText = "مشكلة في الإنترنت أو الموقع معلق.";
             } finally {
-                b.innerText = "اسألي الذكاء الاصطناعي";
+                btn.innerText = "إرسال السؤال";
             }
         }
     </script>
