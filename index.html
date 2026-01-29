@@ -3,240 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NANO OMNI - PRO</title>
+    <title>NANO FINAL SYSTEM</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Tajawal', sans-serif; background-color: #09090b; color: #e2e8f0; }
-        /* تصميم البار الجانبي */
-        .sidebar { width: 80px; transition: 0.3s; background: #18181b; border-left: 1px solid #27272a; height: 100vh; display: flex; flex-direction: column; align-items: center; padding-top: 2rem; position: fixed; right: 0; z-index: 50; }
-        .nav-item { width: 50px; height: 50px; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; color: #71717a; transition: 0.3s; cursor: pointer; }
-        .nav-item:hover { background: #27272a; color: white; }
-        .nav-item.active { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
+        body { font-family: 'Cairo', sans-serif; background-color: #000; color: white; }
         
-        /* منطقة المحتوى */
-        .main-content { margin-right: 80px; height: 100vh; overflow-y: auto; padding: 2rem; position: relative; }
+        /* تأثير حركة الفيديو السينمائي */
+        @keyframes kenburns {
+            0% { transform: scale(1) translate(0, 0); }
+            50% { transform: scale(1.1) translate(-1%, -1%); }
+            100% { transform: scale(1) translate(0, 0); }
+        }
+        .video-effect {
+            animation: kenburns 15s ease-in-out infinite alternate;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
         
-        /* الشات */
-        .chat-msg { max-width: 80%; padding: 1rem 1.5rem; border-radius: 20px; margin-bottom: 1.5rem; line-height: 1.7; font-size: 1.05rem; }
-        .user-msg { background: #27272a; color: white; margin-left: auto; border-bottom-right-radius: 4px; }
-        .bot-msg { background: transparent; border: 1px solid #3f3f46; color: #e2e8f0; margin-right: auto; border-bottom-left-radius: 4px; }
-        
-        /* تأثيرات */
-        .glow-btn { box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
-        .typing-dot { width: 8px; height: 8px; background: #94a3b8; border-radius: 50%; display: inline-block; animation: bounce 1.4s infinite ease-in-out both; margin: 0 2px; }
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
-        
-        /* زر التسجيل */
-        .mic-active { animation: pulse-red 1.5s infinite; background: #ef4444 !important; }
-        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        .loader {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-left-color: #3b82f6;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body>
+<body class="flex flex-col min-h-screen">
 
-    <nav class="sidebar">
-        <div class="mb-8 text-2xl font-black text-blue-500 tracking-tighter">N</div>
+    <div class="bg-red-900 text-center p-2 text-xs text-white font-bold">
+        ⚠ هام: تأكدي من السماح للميكروفون ورفع صوت الجهاز
+    </div>
+
+    <div class="max-w-3xl mx-auto w-full p-6 flex-1 flex flex-col">
         
-        <div class="nav-item active" onclick="switchTab('chat')" title="محادثة صوتية وكتابية">
-            <i class="fa-solid fa-comment-dots text-xl"></i>
-        </div>
-        <div class="nav-item" onclick="switchTab('image')" title="توليد صور">
-            <i class="fa-solid fa-image text-xl"></i>
-        </div>
-        <div class="nav-item" onclick="switchTab('video')" title="توليد فيديو (GIF)">
-            <i class="fa-solid fa-film text-xl"></i>
-        </div>
-        <div class="nav-item" onclick="alert('خدمة الصوت قيد التطوير للنسخة القادمة')" title="صوت">
-            <i class="fa-solid fa-music text-xl"></i>
-        </div>
-    </nav>
-
-    <main id="tab-chat" class="main-content flex flex-col">
-        <div class="flex-1 flex flex-col justify-end max-w-4xl mx-auto w-full pb-24">
-            <div id="chat-history" class="w-full flex flex-col gap-2">
-                <div class="bot-msg chat-msg flex gap-4 items-start">
-                    <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-robot text-sm"></i></div>
-                    <div>
-                        <p>أهلاً بك في نظام NANO OMNI. أنا أسمعك وأراك.<br>يمكنك التحدث معي صوتياً 🎙️ أو كتابة ما تريدين.</p>
-                    </div>
-                </div>
-            </div>
+        <div class="flex justify-between items-center mb-8 border-b border-gray-800 pb-4">
+            <h1 class="text-3xl font-bold text-blue-500">NANO <span class="text-white text-lg">AI</span></h1>
+            <button onclick="enableAudio()" id="audioBtn" class="bg-gray-800 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm transition-all flex items-center gap-2">
+                <span>🔊 تفعيل الصوت</span>
+            </button>
         </div>
 
-        <div class="fixed bottom-0 left-0 right-[80px] bg-[#09090b]/90 backdrop-blur-lg border-t border-white/5 p-6">
-            <div class="max-w-4xl mx-auto relative flex gap-3 items-end">
-                <button id="micBtn" onclick="toggleVoice()" class="w-14 h-14 rounded-full bg-[#27272a] hover:bg-[#3f3f46] text-white flex items-center justify-center transition-all text-xl glow-btn">
-                    <i class="fa-solid fa-microphone"></i>
+        <div id="displayArea" class="bg-[#111] border border-gray-700 rounded-2xl h-[350px] flex items-center justify-center overflow-hidden relative mb-6">
+            <p id="placeholderText" class="text-gray-500">النتائج (صور / فيديو / ردود) ستظهر هنا...</p>
+            <div id="contentBox" class="w-full h-full hidden"></div>
+        </div>
+
+        <div id="chatResponse" class="bg-[#111] p-4 rounded-xl border border-gray-800 min-h-[80px] mb-6 text-gray-300 text-lg leading-relaxed hidden"></div>
+
+        <div class="mt-auto">
+            <textarea id="userInput" class="w-full bg-[#222] text-white p-4 rounded-xl outline-none border border-gray-700 focus:border-blue-500 mb-4 h-24 text-lg resize-none" placeholder="اكتبي هنا (مثال: أريد صورة لقطة، أو مشهد فيديو للبحر)..."></textarea>
+            
+            <div class="grid grid-cols-3 gap-3">
+                <button onclick="handleRequest('chat')" class="bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold text-lg transition-all">
+                    🎤 محادثة
                 </button>
-                <div class="flex-1 bg-[#27272a] rounded-3xl border border-white/10 flex items-center p-2 focus-within:border-blue-500/50 transition-all">
-                    <textarea id="msgInput" rows="1" class="w-full bg-transparent text-white px-4 py-3 outline-none resize-none h-[50px] leading-[25px]" placeholder="تحدث معي..."></textarea>
-                    <button onclick="sendMsg()" class="w-10 h-10 bg-blue-600 hover:bg-blue-500 rounded-full text-white flex items-center justify-center transition-all">
-                        <i class="fa-solid fa-paper-plane text-sm"></i>
-                    </button>
-                </div>
+                <button onclick="handleRequest('image')" class="bg-pink-600 hover:bg-pink-700 text-white py-4 rounded-xl font-bold text-lg transition-all">
+                    🎨 صورة
+                </button>
+                <button onclick="handleRequest('video')" class="bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-xl font-bold text-lg transition-all">
+                    🎬 فيديو
+                </button>
             </div>
         </div>
-    </main>
-
-    <main id="tab-image" class="main-content hidden">
-        <div class="max-w-4xl mx-auto pt-10 text-center">
-            <h2 class="text-4xl font-black mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">استوديو الصور</h2>
-            <p class="text-gray-400 mb-8">اكتبي وصفاً دقيقاً لتحصلي على لوحة فنية</p>
-            
-            <div class="flex gap-2 mb-10 max-w-2xl mx-auto">
-                <input id="imgPrompt" type="text" class="w-full bg-[#18181b] border border-white/10 rounded-xl p-4 text-white outline-none focus:border-blue-500" placeholder="مثال: مدينة مستقبلية في الليل، أضواء نيون...">
-                <button onclick="genImage()" class="bg-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-blue-500 transition-all">إنشاء 🎨</button>
-            </div>
-
-            <div id="imgResult" class="grid grid-cols-1 gap-6"></div>
-        </div>
-    </main>
-
-    <main id="tab-video" class="main-content hidden">
-        <div class="max-w-4xl mx-auto pt-10 text-center">
-            <h2 class="text-4xl font-black mb-4 text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-500">مولد الفيديو (BETA)</h2>
-            <p class="text-gray-400 mb-8">نظام توليد مشاهد متحركة (GIFs) عالية الجودة</p>
-            
-            <div class="flex gap-2 mb-10 max-w-2xl mx-auto">
-                <input id="vidPrompt" type="text" class="w-full bg-[#18181b] border border-white/10 rounded-xl p-4 text-white outline-none focus:border-red-500" placeholder="مثال: أمواج البحر تتحرك ببطء وقت الغروب...">
-                <button onclick="genVideo()" class="bg-red-600 px-8 py-4 rounded-xl font-bold hover:bg-red-500 transition-all">أكشن 🎬</button>
-            </div>
-
-            <div id="vidResult" class="flex justify-center min-h-[300px] bg-[#18181b] rounded-2xl border border-dashed border-white/10 items-center">
-                <span class="text-gray-600">المشهد سيظهر هنا...</span>
-            </div>
-        </div>
-    </main>
+    </div>
 
     <script>
-        // --- 1. نظام التبديل ---
-        function switchTab(tab) {
-            document.querySelectorAll('.main-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`tab-${tab}`).classList.remove('hidden');
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+        // --- 1. إعدادات الصوت (Fix Audio) ---
+        let audioEnabled = false;
+        const synth = window.speechSynthesis;
+
+        function enableAudio() {
+            // تشغيل صوت صامت لفك الحظر عن المتصفح
+            const utterance = new SpeechSynthesisUtterance("تم تفعيل الصوت بنجاح");
+            utterance.lang = 'ar-SA';
+            synth.speak(utterance);
+            audioEnabled = true;
+            const btn = document.getElementById('audioBtn');
+            btn.innerText = "✅ الصوت مفعل";
+            btn.classList.remove('bg-gray-800');
+            btn.classList.add('bg-green-600');
         }
 
-        // --- 2. نظام الشات والصوت ---
-        let recognition;
-        if ('webkitSpeechRecognition' in window) {
-            recognition = new webkitSpeechRecognition();
-            recognition.lang = 'ar-SA';
-            recognition.continuous = false;
-            recognition.interimResults = false;
-
-            recognition.onresult = (event) => {
-                const text = event.results[0][0].transcript;
-                document.getElementById('msgInput').value = text;
-                sendMsg(); // إرسال تلقائي بعد الكلام
-            };
-            
-            recognition.onend = () => {
-                document.getElementById('micBtn').classList.remove('mic-active');
-            };
+        function speakText(text) {
+            if (!audioEnabled) alert("من فضلك اضغطي زر 'تفعيل الصوت' بالأعلى لسماع الرد!");
+            synth.cancel(); // وقف أي كلام قديم
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ar-SA'; 
+            utterance.rate = 1; 
+            synth.speak(utterance);
         }
 
-        function toggleVoice() {
-            if (!recognition) return alert("المتصفح لا يدعم الصوت، جربي Chrome");
-            document.getElementById('micBtn').classList.add('mic-active');
-            recognition.start();
-        }
+        // --- 2. المعالج الرئيسي ---
+        async function handleRequest(type) {
+            const input = document.getElementById('userInput').value;
+            if (!input && type !== 'chat') return alert("اكتبي وصفاً أولاً!");
 
-        async function sendMsg() {
-            const input = document.getElementById('msgInput');
-            const txt = input.value.trim();
-            if(!txt) return;
+            const display = document.getElementById('displayArea');
+            const content = document.getElementById('contentBox');
+            const chatBox = document.getElementById('chatResponse');
+            const placeholder = document.getElementById('placeholderText');
 
-            const chatBox = document.getElementById('chat-history');
-            
-            // إضافة رسالة المستخدم
-            chatBox.innerHTML += `
-                <div class="user-msg chat-msg">
-                    ${txt}
-                </div>`;
-            input.value = '';
-            window.scrollTo(0, document.body.scrollHeight);
+            // إظهار التحميل
+            placeholder.innerHTML = '<div class="loader"></div><br><span class="mt-2 text-sm">جاري المعالجة...</span>';
+            content.classList.add('hidden');
+            chatBox.classList.add('hidden');
 
-            // مؤشر الكتابة
-            const loaderId = 'load-' + Date.now();
-            chatBox.innerHTML += `
-                <div id="${loaderId}" class="bot-msg chat-msg flex gap-4 items-center">
-                    <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center"><i class="fa-solid fa-robot text-sm"></i></div>
-                    <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
-                </div>`;
-
-            try {
-                // استخدام API ذكي للنصوص
-                const res = await fetch(`https://text.pollinations.ai/${encodeURIComponent(txt)}`);
-                const reply = await res.text();
+            // --- أ: المحادثة (Chat) ---
+            if (type === 'chat') {
+                if (!input) {
+                   // تفعيل المايك لو النص فاضي
+                   startMic();
+                   return;
+                }
                 
-                document.getElementById(loaderId).remove();
+                try {
+                    const res = await fetch(`https://text.pollinations.ai/${encodeURIComponent(input)}`);
+                    const reply = await res.text();
+                    
+                    placeholder.innerText = "";
+                    chatBox.innerHTML = reply;
+                    chatBox.classList.remove('hidden');
+                    speakText(reply);
+                    
+                } catch (e) {
+                    placeholder.innerText = "حدث خطأ في الاتصال";
+                }
+            }
+
+            // --- ب: الصور (Image) ---
+            else if (type === 'image') {
+                const imgUrl = `https://pollinations.ai/p/${encodeURIComponent(input)}?width=1280&height=720&model=flux&seed=${Math.random()}`;
                 
-                // عرض الرد
-                chatBox.innerHTML += `
-                    <div class="bot-msg chat-msg flex gap-4 items-start animate-fade-in">
-                        <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-robot text-sm"></i></div>
-                        <div class="prose prose-invert">${marked.parse(reply)}</div>
+                content.innerHTML = `<img src="${imgUrl}" class="w-full h-full object-contain rounded-lg" onload="imgLoaded()">`;
+                content.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+                speakText("تم إنشاء الصورة بناءً على طلبك");
+            }
+
+            // --- ج: الفيديو (Video Simulation) ---
+            else if (type === 'video') {
+                // خدعة: بنجيب صورة عالية الجودة ونطبق عليها CSS Animation
+                const vidUrl = `https://pollinations.ai/p/${encodeURIComponent(input + " cinematic 8k detailed scene")}&width=1280&height=720&model=flux`;
+                
+                content.innerHTML = `
+                    <div class="w-full h-full overflow-hidden relative rounded-lg">
+                        <img src="${vidUrl}" class="video-effect" onload="imgLoaded()">
+                        <div class="absolute bottom-4 right-4 bg-red-600 text-white px-2 py-1 text-xs font-bold rounded animate-pulse">REC</div>
                     </div>`;
                 
-                // نطق الرد (محادثة مباشرة)
-                speak(reply);
-
-            } catch (e) {
-                document.getElementById(loaderId).innerText = "حدث خطأ في الاتصال بالسيرفر.";
+                content.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+                speakText("جاري عرض المشهد السينمائي");
             }
-            window.scrollTo(0, document.body.scrollHeight);
         }
 
-        function speak(text) {
-            window.speechSynthesis.cancel();
-            // تنظيف النص من الرموز لتسهيل القراءة
-            const cleanText = text.replace(/[*#]/g, '');
-            const utterance = new SpeechSynthesisUtterance(cleanText);
-            utterance.lang = 'ar-SA';
-            utterance.rate = 1;
-            utterance.pitch = 1;
-            window.speechSynthesis.speak(utterance);
+        function imgLoaded() {
+            document.getElementById('placeholderText').classList.add('hidden');
         }
 
-        // --- 3. نظام الصور ---
-        function genImage() {
-            const p = document.getElementById('imgPrompt').value;
-            if(!p) return;
-            const div = document.getElementById('imgResult');
-            div.innerHTML = '<div class="text-center text-blue-500 py-10"><i class="fa-solid fa-circle-notch fa-spin text-3xl"></i><br>جاري الرسم بدقة 4K...</div>';
-            
-            const url = `https://pollinations.ai/p/${encodeURIComponent(p)}?width=1280&height=720&seed=${Math.random()}&model=flux`;
-            
-            const img = new Image();
-            img.src = url;
-            img.onload = () => {
-                div.innerHTML = `<img src="${url}" class="w-full rounded-2xl shadow-2xl border border-white/10 hover:scale-[1.01] transition-all duration-500">`;
-            };
-        }
-
-        // --- 4. نظام الفيديو (GIF) ---
-        function genVideo() {
-            const p = document.getElementById('vidPrompt').value;
-            if(!p) return;
-            const div = document.getElementById('vidResult');
-            div.innerHTML = '<div class="text-center text-red-500 py-10"><i class="fa-solid fa-video fa-bounce text-3xl"></i><br>جاري إخراج المشهد...</div>';
-            
-            // استخدام خدعة التوليد المتتابع لعمل GIF (محاكاة فيديو)
-            // ملاحظة: روابط الفيديو المجانية نادرة، هنا نستخدم صور بجودة سينمائية عالية جداً كبديل
-            const url = `https://pollinations.ai/p/${encodeURIComponent(p + " cinematic moving motion blur 4k video frame")}?width=720&height=1280&seed=${Math.random()}&model=turbo`;
-            
-            setTimeout(() => {
-                div.innerHTML = `
-                <div class="relative w-full max-w-sm mx-auto">
-                    <img src="${url}" class="w-full rounded-2xl shadow-2xl border-4 border-red-900/50">
-                    <div class="absolute bottom-4 right-4 bg-red-600 text-white text-xs px-2 py-1 rounded font-bold">GIF/Scene</div>
-                </div>`;
-            }, 2000);
+        // --- 3. الميكروفون (Speech to Text) ---
+        function startMic() {
+            if ('webkitSpeechRecognition' in window) {
+                const recognition = new webkitSpeechRecognition();
+                recognition.lang = 'ar-SA';
+                recognition.onstart = () => { document.getElementById('placeholderText').innerText = "🎤 أنا سامعك... اتكلمي"; };
+                
+                recognition.onresult = (event) => {
+                    const txt = event.results[0][0].transcript;
+                    document.getElementById('userInput').value = txt;
+                    handleRequest('chat'); // إرسال تلقائي
+                };
+                recognition.start();
+            } else {
+                alert("الميكروفون غير مدعوم في هذا المتصفح، جربي Chrome");
+            }
         }
     </script>
 </body>
