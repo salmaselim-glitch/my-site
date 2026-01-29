@@ -3,139 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NANO OMNI AI | النسخة الاحترافية</title>
+    <title>NANO OMNI | AI SYSTEM</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Cairo', sans-serif; background: #0a0a0c; color: #f4f4f5; margin: 0; overflow: hidden; }
-        .main-grid { display: grid; grid-template-columns: 1fr 400px; height: 100vh; }
-        .chat-section { display: flex; flex-direction: column; border-left: 1px solid #27272a; background: #09090b; }
-        .display-section { background: #000; display: flex; items: center; justify-content: center; padding: 20px; position: relative; }
-        .glass-input { background: #18181b; border: 1px solid #27272a; border-radius: 20px; padding: 15px; width: 100%; color: white; outline: none; transition: 0.3s; }
-        .glass-input:focus { border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
-        .btn-primary { background: linear-gradient(135deg, #2563eb, #1d4ed8); border-radius: 15px; padding: 12px 25px; font-weight: bold; transition: 0.3s; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4); }
-        .response-bubble { background: #18181b; border-radius: 20px; padding: 20px; margin-bottom: 20px; border-right: 4px solid #3b82f6; }
-        .mic-btn { width: 60px; height: 60px; border-radius: 50%; background: #27272a; display: flex; items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
-        .mic-active { background: #ef4444; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
+        body { font-family: 'Cairo', sans-serif; background: #050505; color: white; }
+        .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); }
+        .neon-glow { box-shadow: 0 0 20px rgba(37, 99, 235, 0.2); }
+        .input-area { background: #111; border: 1px solid #222; border-radius: 24px; padding: 12px 20px; transition: 0.3s; }
+        .input-area:focus-within { border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .loading { animation: pulse 1.5s infinite; }
     </style>
 </head>
-<body>
+<body class="flex flex-col h-screen overflow-hidden">
 
-    <div class="main-grid">
-        <section class="display-section">
-            <div id="mediaPlaceholder" class="text-center">
-                <div class="text-6xl mb-4 opacity-20">🎬</div>
-                <p class="text-gray-500 font-bold">شاشة العرض الذكية NANO</p>
-                <p class="text-xs text-gray-700">الصور والفيديوهات ستظهر هنا بدقة عالية</p>
-            </div>
-            <div id="mediaTarget" class="hidden w-full h-full flex items-center justify-center"></div>
-            <div id="loader" class="hidden absolute inset-0 bg-black/80 z-10 flex items-center justify-center">
-                <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-        </section>
+    <nav class="p-6 border-b border-white/5 flex justify-between items-center glass">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-black text-xl shadow-lg shadow-blue-500/20">N</div>
+            <h1 class="font-black text-2xl tracking-tighter">NANO <span class="text-blue-500">AI</span></h1>
+        </div>
+        <div class="flex gap-4">
+            <button onclick="activateVoice()" id="vBtn" class="px-5 py-2 rounded-full border border-white/20 text-sm font-bold hover:bg-white hover:text-black transition">تفعيل الصوت 🔊</button>
+        </div>
+    </nav>
 
-        <section class="chat-section p-6">
-            <div class="flex items-center gap-3 mb-8">
-                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-black text-xl">N</div>
-                <h1 class="text-xl font-black tracking-widest">NANO OMNI</h1>
-            </div>
-
-            <div id="chatHistory" class="flex-1 overflow-y-auto mb-6 pr-2">
-                <div class="response-bubble">
-                    <p class="text-blue-400 text-sm font-bold mb-1">NANO AI:</p>
-                    <p>أهلاً بكِ. أنا نظام NANO المتكامل. جاهز لتوليد الصور، الفيديوهات، والدردشة الصوتية المباشرة. كيف أخدمكِ؟</p>
+    <main class="flex-1 overflow-hidden flex flex-col md:flex-row p-6 gap-6">
+        
+        <div class="flex-1 flex flex-col gap-4">
+            <div id="chatBox" class="flex-1 overflow-y-auto space-y-4 pr-2">
+                <div class="p-4 rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-100">
+                    مرحباً بكِ. أنا نظام NANO. جاهز لتنفيذ أوامركِ بالصوت والصورة.
                 </div>
             </div>
 
-            <div class="space-y-4">
-                <textarea id="userInput" class="glass-input h-24 resize-none" placeholder="اكتبي أوامرك هنا..."></textarea>
-                <div class="flex gap-2">
-                    <button onclick="process('chat')" class="btn-primary flex-1">دردشة 💬</button>
-                    <button onclick="process('image')" class="bg-zinc-800 hover:bg-zinc-700 p-4 rounded-xl font-bold">صورة 🖼️</button>
-                    <button onclick="process('video')" class="bg-zinc-800 hover:bg-zinc-700 p-4 rounded-xl font-bold">فيديو 🎬</button>
-                    <div id="micBtn" onclick="toggleMic()" class="mic-btn">🎙️</div>
+            <div class="input-area flex flex-col gap-2">
+                <textarea id="userInput" class="w-full bg-transparent outline-none text-lg resize-none h-20" placeholder="اسألي، ارسمي، أو اطلبي فيديو..."></textarea>
+                <div class="flex justify-between items-center border-t border-white/5 pt-3">
+                    <div class="flex gap-2">
+                        <button onclick="startMic()" class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center transition" title="تحدث">🎙️</button>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="handle('chat')" class="bg-blue-600 px-6 py-2 rounded-xl font-bold hover:bg-blue-700 transition">دردشة</button>
+                        <button onclick="handle('image')" class="bg-white text-black px-6 py-2 rounded-xl font-bold hover:bg-gray-200 transition">رسم 🎨</button>
+                        <button onclick="handle('video')" class="bg-zinc-800 px-6 py-2 rounded-xl font-bold hover:bg-zinc-700 transition border border-white/10">فيديو 🎬</button>
+                    </div>
                 </div>
             </div>
-        </section>
-    </div>
+        </div>
+
+        <div class="w-full md:w-[400px] glass rounded-[32px] overflow-hidden flex flex-col">
+            <div class="p-4 border-b border-white/5 text-center text-xs font-bold uppercase tracking-widest text-gray-500">Preview Hub</div>
+            <div id="previewArea" class="flex-1 flex items-center justify-center p-4 relative">
+                <p id="placeholder" class="text-gray-700 text-center font-bold">النتائج المرئية تظهر هنا</p>
+                <div id="mediaBox" class="hidden w-full h-full"></div>
+                <div id="loader" class="hidden absolute flex flex-col items-center">
+                    <div class="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-2"></div>
+                    <span class="text-xs text-blue-500 font-bold loading">الذكاء يعمل...</span>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <script>
-        const history = document.getElementById('chatHistory');
-        const media = document.getElementById('mediaTarget');
-        const placeholder = document.getElementById('mediaPlaceholder');
-        const loader = document.getElementById('loader');
+        let isVoice = false;
+        const synth = window.speechSynthesis;
 
-        // 1. نظام الصوت والنطق
+        function activateVoice() {
+            const u = new SpeechSynthesisUtterance("نظام نانو الصوتي مفعل");
+            u.lang = 'ar-SA';
+            synth.speak(u);
+            isVoice = true;
+            document.getElementById('vBtn').innerText = "صوت مفعل ✅";
+        }
+
         function speak(text) {
-            window.speechSynthesis.cancel();
-            const utter = new SpeechSynthesisUtterance(text);
-            utter.lang = 'ar-SA';
-            utter.rate = 1.1;
-            window.speechSynthesis.speak(utter);
+            if(!isVoice) return;
+            synth.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'ar-SA';
+            synth.speak(u);
         }
 
-        // 2. نظام التعرف على الصوت (المحادثة المباشرة)
-        let recognition;
-        if ('webkitSpeechRecognition' in window) {
-            recognition = new webkitSpeechRecognition();
-            recognition.lang = 'ar-SA';
-            recognition.onresult = (e) => {
-                const speech = e.results[0][0].transcript;
-                document.getElementById('userInput').value = speech;
-                process('chat');
-            };
-            recognition.onend = () => document.getElementById('micBtn').classList.remove('mic-active');
-        }
+        async function handle(type) {
+            const prompt = document.getElementById('userInput').value;
+            if(!prompt) return;
 
-        function toggleMic() {
-            if (!recognition) return alert("متصفحك لا يدعم التعرف على الصوت");
-            document.getElementById('micBtn').classList.add('mic-active');
-            recognition.start();
-        }
-
-        // 3. المعالجة الذكية
-        async function process(type) {
-            const input = document.getElementById('userInput').value;
-            if (!input && type !== 'chat') return;
+            const chatBox = document.getElementById('chatBox');
+            const mediaBox = document.getElementById('mediaBox');
+            const loader = document.getElementById('loader');
+            const placeholder = document.getElementById('placeholder');
 
             loader.classList.remove('hidden');
+            placeholder.classList.add('hidden');
 
-            if (type === 'chat') {
+            if(type === 'chat') {
                 try {
-                    // نظام الهوية المفروضة
-                    const res = await fetch(`https://text.pollinations.ai/${encodeURIComponent("أنت اسمك نانو (NANO)، نظام ذكاء اصطناعي فخم واحترافي. أجب باختصار: " + input)}`);
-                    const reply = await res.text();
-                    
-                    history.innerHTML += `
-                        <div class="response-bubble animate-fade-in">
-                            <p class="text-blue-400 text-sm font-bold mb-1">NANO AI:</p>
-                            <p>${reply}</p>
-                        </div>`;
-                    history.scrollTop = history.scrollHeight;
-                    speak(reply);
-                } catch (e) { console.error(e); }
+                    const res = await fetch(`https://text.pollinations.ai/${encodeURIComponent("أنت نظام نانو (NANO) المتطور. أجب باختصار واحترافية: " + prompt)}`);
+                    const data = await res.text();
+                    chatBox.innerHTML += `<div class="p-4 rounded-2xl bg-white/5 border border-white/10 text-gray-300"><b>NANO:</b> ${data}</div>`;
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                    speak(data);
+                } catch(e) { console.error(e); }
                 loader.classList.add('hidden');
-            } 
-            
-            else if (type === 'image' || type === 'video') {
-                const url = `https://pollinations.ai/p/${encodeURIComponent(input)}?width=1024&height=1024&seed=${Math.random()}&model=flux`;
-                
-                placeholder.classList.add('hidden');
-                media.classList.remove('hidden');
-                
-                const img = new Image();
-                img.src = url;
-                img.className = (type === 'video') ? "w-full h-full object-cover rounded-3xl animate-pulse shadow-2xl" : "max-w-full max-h-full object-contain rounded-2xl shadow-2xl border-4 border-zinc-800";
-                
-                img.onload = () => {
-                    media.innerHTML = '';
-                    media.appendChild(img);
-                    loader.classList.add('hidden');
-                    speak(type === 'image' ? "تم توليد الصورة بنجاح" : "تم معالجة مشهد الفيديو");
-                };
+            } else {
+                const url = `https://pollinations.ai/p/${encodeURIComponent(prompt)}?width=1080&height=1080&seed=${Math.random()}&model=flux`;
+                mediaBox.innerHTML = `<img src="${url}" class="w-full h-full object-cover rounded-2xl shadow-2xl ${type==='video' ? 'animate-pulse' : ''}">`;
+                mediaBox.classList.remove('hidden');
+                loader.classList.add('hidden');
+                speak(`تم إنشاء ${type==='image' ? 'الصورة' : 'الفيديو'}`);
             }
+        }
+
+        function startMic() {
+            if (!('webkitSpeechRecognition' in window)) return alert("المتصفح لا يدعم الصوت");
+            const rec = new webkitSpeechRecognition();
+            rec.lang = 'ar-SA';
+            rec.onstart = () => { document.getElementById('userInput').placeholder = "🎤 أنا أسمعك الآن..."; };
+            rec.onresult = (e) => {
+                document.getElementById('userInput').value = e.results[0][0].transcript;
+                handle('chat');
+            };
+            rec.start();
         }
     </script>
 </body>
