@@ -1,54 +1,96 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>NANO SYSTEM</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background: #000; color: #fff; font-family: sans-serif; }
-        .card { background: #0f0f0f; border: 1px solid #1f1f1f; border-radius: 20px; }
-        input, textarea { background: #1a1a1a !important; border: 1px solid #333 !important; color: white !important; }
-    </style>
-</head>
-<body class="p-5 flex flex-col items-center min-h-screen justify-center">
+ai-platform/
+│
+├── backend/
+│   ├── server.js
+│   ├── routes/
+│   │   ├── auth.js
+│   │   ├── ai.js
+│   │   ├── subscription.js
+│   ├── middleware/
+│   │   ├── authMiddleware.js
+│   └── models/
+│       └── User.js
+│
+├── frontend/
+│   ├── pages/
+│   ├── components/
+│   └── dashboard/
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
 
-    <div class="max-w-xl w-full card p-8 shadow-2xl">
-        <h1 class="text-3xl font-bold text-blue-500 mb-6 text-center italic">NANO AI</h1>
-        
-        <textarea id="inp" class="w-full rounded-xl p-4 mb-4 h-32 outline-none focus:border-blue-600 transition" placeholder="اكتبي طلبك هنا (شات أو وصف صورة)..."></textarea>
-        
-        <div class="grid grid-cols-2 gap-3 mb-6">
-            <button onclick="doChat()" class="bg-blue-600 py-3 rounded-lg font-bold hover:bg-blue-700">محادثة (صوت/نص)</button>
-            <button onclick="doImg()" class="bg-white text-black py-3 rounded-lg font-bold hover:bg-gray-200">توليد صورة</button>
-        </div>
+dotenv.config();
+const app = express();
 
-        <div id="status" class="text-sm text-gray-500 mb-4 text-center"></div>
-        <div id="txtRes" class="text-gray-300 leading-relaxed bg-black/50 p-4 rounded-lg hidden mb-4"></div>
-        <div id="imgRes" class="rounded-xl overflow-hidden border border-gray-800 hidden"></div>
-    </div>
+app.use(cors());
+app.use(express.json());
 
-    <script>
-        const msg = document.getElementById('status');
-        const txt = document.getElementById('txtRes');
-        const img = document.getElementById('imgRes');
+app.use("/api/ai", require("./routes/ai"));
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/subscription", require("./routes/subscription"));
 
-        async function doChat() {
-            const val = document.getElementById('inp').value; if(!val) return;
-            msg.innerText = "جاري التفكير..."; txt.classList.add('hidden');
-            try {
-                const r = await fetch(`https://text.pollinations.ai/${encodeURIComponent("أنت نانو، ذكاء اصطناعي محترف. أجب باختصار: " + val)}`);
-                const res = await r.text();
-                msg.innerText = ""; txt.innerText = res; txt.classList.remove('hidden');
-                const u = new SpeechSynthesisUtterance(res); u.lang = 'ar-SA'; window.speechSynthesis.speak(u);
-            } catch(e) { msg.innerText = "خطأ في الاتصال"; }
-        }
+app.listen(5000, () => {
+  console.log("Server running on port 5000");
+});
+import OpenAI from "openai";
 
-        function doImg() {
-            const val = document.getElementById('inp').value; if(!val) return;
-            msg.innerText = "جاري الرسم..."; img.classList.add('hidden');
-            const url = `https://pollinations.ai/p/${encodeURIComponent(val)}?width=1024&height=1024&model=flux&seed=${Math.random()}`;
-            img.innerHTML = `<img src="${url}" class="w-full" onload="document.getElementById('status').innerText=''; document.getElementById('imgRes').classList.remove('hidden')">`;
-        }
-    </script>
-</body>
-</html>
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_KEY,
+});
+
+export async function chatAI(prompt) {
+  const response = await openai.chat.completions.create({
+    model: "gpt-4.1",
+    messages: [
+      { role: "system", content: "أنت مساعد ذكي محترف" },
+      { role: "user", content: prompt },
+    ],
+  });
+
+  return response.choices[0].message.content;
+}
+const image = await openai.images.generate({
+  model: "gpt-image-1",
+  prompt: "طبيب ذكاء اصطناعي في عيادة مستقبلية",
+  size: "1024x1024",
+});
+
+res.json({ image: image.data[0].url });
+import fs from "fs";
+import path from "path";
+
+const speech = await openai.audio.speech.create({
+  model: "gpt-4o-mini-tts",
+  voice: "alloy",
+  input: "مرحباً، أنا مساعدك الذكي",
+});
+
+fs.writeFileSync("voice.mp3", Buffer.from(await speech.arrayBuffer()));
+POST https://api.runwayml.com/v1/generate
+Authorization: Bearer YOUR_KEY
+{
+  "prompt": "طبيب ذكاء اصطناعي يشرح العلاج"
+} 
+POST https://api.runwayml.com/v1/generate
+Authorization: Bearer YOUR_KEY
+{
+ system: `
+أنت مساعد طبي ذكي.
+لا تقدم تشخيص نهائي.
+دائمًا اطلب مراجعة طبيب بشري.
+`
+import Stripe from "stripe";
+const stripe = new Stripe(process.env.STRIPE_KEY);
+
+const session = await stripe.checkout.sessions.create({
+  mode: "subscription",
+  line_items: [{
+    price: "price_xxx",
+    quantity: 1,
+  }],
+  success_url: "https://yoursite.com/success",
+  cancel_url: "https://yoursite.com/cancel",
+});
+if (!user.isPremium) {
+  return res.status(403).json({ message: "الاشتراك مطلوب" });
+}
